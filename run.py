@@ -8,7 +8,6 @@ import PIL
 
 WIDTH, HEIGHT = 400, 400
 CENTER = WIDTH // 2
-WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 MODEL_PATH = "models/MNIST_model.pth"
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -99,16 +98,18 @@ class PaintGUI:
         self.model.eval()
         with torch.inference_mode():
             pred = self.model(arr).numpy()
-            print(pred.argmax())
+            n = pred.argmax()
+            print(f"=> {n}, probability: {pred[n] * 100:.2f}%")
         
-        import matplotlib.pyplot as plt
-        plt.imshow(arr.reshape(28, 28), cmap="gray")
-        plt.axis("off")
-        plt.show()
+        # see what the nn sees
+        #import matplotlib.pyplot as plt
+        #plt.imshow(arr.reshape(28, 28), cmap="gray")
+        #plt.axis("off")
+        #plt.show()
 
     def clear(self):
         self.cnv.delete("all")
-        self.draw.rectangle([0, 0, 1000, 1000], fill="white")
+        self.draw.rectangle([0, 0, 1000, 1000], fill="black")
 
     def on_closing(self):
         print("Window closed")
