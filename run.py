@@ -1,13 +1,17 @@
+import numpy as np
+import torch
+from torch import nn
 from tkinter import *
 from tkinter import filedialog, messagebox, colorchooser
 from PIL import ImageDraw
 import PIL
-import numpy as np
 
 WIDTH, HEIGHT = 400, 400
 CENTER = WIDTH // 2
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+MODEL_PATH = "models/MNIST_model.pth"
+device = "cuda" if torch.cuda.is_available() else "cpu"
 
 def img_to_arr(image_path):
     with PIL.Image.open(image_path) as img:
@@ -20,8 +24,23 @@ def img_to_arr(image_path):
 
     return grayscale_arr.flatten()
 
-class PaintGUI:
+class MNIST(nn.Module):
     def __init__(self):
+        super().__init__()
+        self.h1 = nn.Linear(784, 128)
+        self.act1 = nn.ReLU()
+        self.output = nn.Linear(128, 10)
+        self.act_output = nn.Sigmoid()
+
+    def forward(self, X: torch.Tensor) -> torch.Tensor:
+        X = self.act1(self.h1(X))
+        X = self.act_output(self.output(X))
+        return X
+
+class PaintGUI:
+    def __init__(self, model):
+        self.model = model
+
         self.root = Tk()
         self.root.title("Number Classifier")
 
@@ -75,9 +94,17 @@ class PaintGUI:
         self._save()
         arr = img_to_arr("num.png")
         arr = arr/arr.max()
-        print(arr)
+        arr = torch.from_numpy(arr).type(torch.float)
 
-        # pass arr through model
+        self.model.eval()
+        with torch.inference_mode():
+            pred = self.model(arr).numpy()
+            print(pred.argmax())
+        
+        import matplotlib.pyplot as plt
+        plt.imshow(arr.reshape(28, 28), cmap="gray")
+        plt.axis("off")
+        plt.show()
 
     def clear(self):
         self.cnv.delete("all")
@@ -86,14 +113,11 @@ class PaintGUI:
     def on_closing(self):
         print("Window closed")
 
-# load model
-# forward image through model
-# print in terminal what was predicted
-
-# popup in tk window of what was predicted
-
 def main():
-    PaintGUI()
+    print(f"Using device: \"{device}\"")
+    model = MNIST()
+    model.load_state_dict(torch.load(f=MODEL_PATH, map_location=device))
+    PaintGUI(model)
 
 if __name__ == "__main__":
   main()
