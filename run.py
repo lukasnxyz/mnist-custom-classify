@@ -93,7 +93,7 @@ class PaintGUI:
         self._save()
         arr = img_to_arr("num.png")
         arr = arr/arr.max()
-        arr = torch.from_numpy(arr).type(torch.float)
+        arr = torch.from_numpy(arr).type(torch.float).to(device)
 
         self.model.eval()
         with torch.inference_mode():
@@ -116,7 +116,7 @@ class PaintGUI:
 
 def main():
     print(f"Using device: \"{device}\"")
-    model = MNIST()
+    model = MNIST().to(device)
     model.load_state_dict(torch.load(f=MODEL_PATH, map_location=device))
     PaintGUI(model)
 
