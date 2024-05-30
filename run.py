@@ -2,7 +2,7 @@ import numpy as np
 import torch
 from torch import nn
 from tkinter import *
-from tkinter import filedialog, messagebox, colorchooser
+from tkinter import filedialog, simpledialog
 from PIL import ImageDraw
 import PIL
 
@@ -11,6 +11,7 @@ CENTER = WIDTH // 2
 BLACK = (0, 0, 0)
 MODEL_PATH = "models/MNIST_model.pth"
 device = "cuda" if torch.cuda.is_available() else "cpu"
+model_modified = False
 
 def img_to_arr(image_path):
     with PIL.Image.open(image_path) as img:
@@ -57,15 +58,17 @@ class PaintGUI:
         self.btn_frame.pack(fill=X)
 
         self.btn_frame.columnconfigure(0, weight=1)
-        self.btn_frame.columnconfigure(1, weight=1)
 
         self.clear_btn = Button(self.btn_frame, text="Clear", command=self.clear)
-        self.clear_btn.grid(row=1, column=1, sticky=W+E)
+        self.clear_btn.grid(row=1, column=0, sticky=W+E)
 
         self.classify_btn = Button(self.btn_frame, text="Classify", command=self.classify)
-        self.classify_btn.grid(row=2, column=1, sticky=W+E)
+        self.classify_btn.grid(row=2, column=0, sticky=W+E)
 
-        #self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.classify_btn = Button(self.btn_frame, text="Train", command=self.train)
+        self.classify_btn.grid(row=3, column=0, sticky=W+E)
+
+        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.root.mainloop()
 
     def paint(self, event):
@@ -89,35 +92,61 @@ class PaintGUI:
         if filename != "":
             self.image.save(filename)
 
-    def classify(self):
+    def _save_to_arr(self):
         self._save()
         arr = img_to_arr("num.png")
         arr = arr/arr.max()
         arr = torch.from_numpy(arr).type(torch.float).to(device)
+        return arr
+
+    def classify(self):
+        arr = self._save_to_arr()
 
         self.model.eval()
         with torch.inference_mode():
             pred = self.model(arr).numpy()
             n = pred.argmax()
             print(f"=> {n}, probability: {pred[n] * 100:.2f}%")
-        
-        # see what the nn sees
-        #import matplotlib.pyplot as plt
-        #plt.imshow(arr.reshape(28, 28), cmap="gray")
-        #plt.axis("off")
-        #plt.show()
+
+    def _train_single(self, arr, label):
+        label = torch.from_numpy(label).to(device)
+        loss_fn = loss_fn = nn.CrossEntropyLoss()
+        optimizer = optim = torch.optim.Adam(self.model.parameters(), lr=0.001)
+
+        self.model.train()
+        out = self.model(arr)
+        loss = loss_fn(out, label)
+        optim.zero_grad()
+        loss.backward()
+        optim.step()
+
+    def train(self):
+        global model_modified
+        model_modified = True
+        arr = self._save_to_arr()
+
+        label = int(simpledialog.askstring("Label", "Label:"))
+        self._train_single(arr, np.array(label))
+        print(f"Trained network with 1 sample of class: \"{label}\"")
 
     def clear(self):
         self.cnv.delete("all")
         self.draw.rectangle([0, 0, 1000, 1000], fill="black")
 
     def on_closing(self):
-        print("Window closed")
+        if model_modified:
+            print(f"Saving model to: {MODEL_PATH}")
+            from pathlib import Path
+            torch.save(obj=self.model.state_dict(),
+                       f=MODEL_PATH)
+        print("Closing window")
+        self.root.destroy()
 
 def main():
     print(f"Using device: \"{device}\"")
     model = MNIST().to(device)
     model.load_state_dict(torch.load(f=MODEL_PATH, map_location=device))
+
     PaintGUI(model)
 
 if __name__ == "__main__":
