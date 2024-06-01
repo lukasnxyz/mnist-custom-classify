@@ -10,18 +10,16 @@ WIDTH, HEIGHT = 400, 400
 CENTER = WIDTH // 2
 BLACK = (0, 0, 0)
 MODEL_PATH = "models/MNIST_model.pth"
+
 device = "cuda" if torch.cuda.is_available() else "cpu"
 model_modified = False
 
-def img_to_arr(image_path):
-    with PIL.Image.open(image_path) as img:
-        img = img.convert("RGB")
-        img = img.resize((28, 28))
-
+def img_to_arr(img_path: str) -> np.ndarray:
+    with PIL.Image.open(img_path) as img:
+        img = img.convert("RGB").resize((28, 28))
         rgb_arr = np.array(img)
         grayscale_arr = 0.299 * rgb_arr[:, :, 0] + 0.587 * rgb_arr[:, :, 1] + 0.114 * rgb_arr[:, :, 2]
         grayscale_arr = grayscale_arr.astype(np.uint8)
-
     return grayscale_arr.flatten()
 
 class MNIST(nn.Module):
@@ -92,7 +90,7 @@ class PaintGUI:
         if filename != "":
             self.image.save(filename)
 
-    def _save_to_arr(self):
+    def _save_to_arr(self) -> torch.Tensor:
         self._save()
         arr = img_to_arr("num.png")
         arr = arr/arr.max()
@@ -108,7 +106,7 @@ class PaintGUI:
             n = pred.argmax()
             print(f"=> {n}, probability: {pred[n] * 100:.2f}%")
 
-    def _train_single(self, arr, label):
+    def _train_single_step(self, arr: torch.Tensor, label: torch.Tensor):
         label = torch.from_numpy(label).to(device)
         loss_fn = loss_fn = nn.CrossEntropyLoss()
         optimizer = optim = torch.optim.Adam(self.model.parameters(), lr=0.001)
@@ -126,7 +124,7 @@ class PaintGUI:
         arr = self._save_to_arr()
 
         label = int(simpledialog.askstring("Label", "Label:"))
-        self._train_single(arr, np.array(label))
+        self._train_single_step(arr, np.array(label))
         print(f"Trained network with 1 sample of class: \"{label}\"")
 
     def clear(self):

@@ -21,5 +21,6 @@ pip3 install -r requirements.txt
 python3 run.py
 ```
 
-#### Additional ideas
-* fine-tune the model with each input (prompt the user for a text input num as well)
+#### Ideas
+* Use ConvNet to classify
+* Create a hosted web front-end
