@@ -11,6 +11,7 @@ gpu on colab which says a lot.
 ![example run gif](data/example_run.gif)
 
 #### Quick start
+You need torch, numpy, and tkinter to run locally
 ```bash
 python3 -m venv venv
 source venv/bin/activate
@@ -20,7 +21,3 @@ pip3 install -r requirements.txt
 ```bash
 python3 run.py
 ```
-
-#### Ideas
-* Use ConvNet to classify
-* Create a hosted web front-end

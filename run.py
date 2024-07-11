@@ -11,7 +11,7 @@ CENTER = WIDTH // 2
 BLACK = (0, 0, 0)
 MODEL_PATH = "models/MNIST_model.pth"
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
+device = "cuda" if torch.cuda.is_available() else "cpu" # change this to mps
 model_modified = False
 
 def img_to_arr(img_path: str) -> np.ndarray:
@@ -22,6 +22,7 @@ def img_to_arr(img_path: str) -> np.ndarray:
         grayscale_arr = grayscale_arr.astype(np.uint8)
     return grayscale_arr.flatten()
 
+# going to change model anyway
 class MNIST(nn.Module):
     def __init__(self):
         super().__init__()
