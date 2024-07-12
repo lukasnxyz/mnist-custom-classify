@@ -1,6 +1,6 @@
 .ipynb_checkpoints/
 .vscode/
 data/*.csv
-data/fine_tune_nums/
 venv/
 num.png
+models/

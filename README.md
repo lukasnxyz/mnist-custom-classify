@@ -11,7 +11,8 @@ gpu on colab which says a lot.
 ![example run gif](data/example_run.gif)
 
 #### Quick start
-You need torch, numpy, and tkinter to run locally
+You need torch, numpy, and tkinter to run locally. Also make sure you unzip the mnist data and then
+add the test into the train file because the splitting happens in the notebook.
 ```bash
 python3 -m venv venv
 source venv/bin/activate
