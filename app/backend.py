@@ -20,7 +20,8 @@ def preprocess_image(image):
     resize = transforms.Resize([28, 28])
     image = resize(image)
     image = torch.from_numpy(np.array(image))
-    #image = image[:, :, 0]
+    image = image[:, :, 3].flatten()
+    image = (image/image.max()).unsqueeze(dim=0)
     return image
 
 @app.route('/classify', methods=['POST'])
@@ -29,10 +30,13 @@ def classify():
     image_data = data['image'].split(",")[1]
     image = Image.open(io.BytesIO(base64.b64decode(image_data)))
     image = preprocess_image(image)
-    #with torch.no_grad():
-    #    output = model(image_tensor)
-    #    _, predicted = torch.max(output, 1)
-    return jsonify({'digit': 69})
+    with torch.no_grad():
+        out = model(image)
+        prob = out.max()
+        print(prob)
+        print(out)
+        predicted = torch.argmax(out)
+    return jsonify({'digit': predicted.item()})
 
 if __name__ == '__main__':
     app.run(debug=True)
