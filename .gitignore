@@ -1,6 +1,5 @@
 .ipynb_checkpoints/
 .vscode/
-data/*.csv
 venv/
+data/*.csv
 num.png
-models/

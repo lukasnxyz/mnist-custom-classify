@@ -1,4 +1,4 @@
-### MNIST Classifier 
+### MNIST Inference 
 I trained a simple mnist model using pytorch and a gpu on google colab then created a small 
 front-end that allows you to draw numbers and feed them through the model to predict what
 number you drew. It's pretty inaccurate. The pre-trained model is in this repo as well as 
