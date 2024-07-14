@@ -33,9 +33,10 @@ def classify():
     image = preprocess_image(image)
     with torch.no_grad():
         out = model(image)
-        prob = out.max()
+        prob = out.max().item() * 100
+        prob = f'{prob:.2f}%'
         predicted = torch.argmax(out)
-    return jsonify({'digit': predicted.item(), 'prob': prob.item()})
+    return jsonify({'digit': predicted.item(), 'prob': prob})
 
 if __name__ == '__main__':
     app.run(debug=True)
