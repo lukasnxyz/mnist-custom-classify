@@ -8,8 +8,9 @@ import numpy as np
 from model import mnist_model
 
 app = Flask(__name__)
+device = torch.device('cpu')
 model = mnist_model(784, 128, 10)
-model.load_state_dict(torch.load('../models/MNIST_model_revised.pth'))
+model.load_state_dict(torch.load('../models/MNIST_model_revised.pth', map_location=device))
 model.eval()
 
 @app.route('/')
