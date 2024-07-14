@@ -12,8 +12,6 @@ canvas {
     background-color: lightgray;
     border: 1px solid black;
     cursor: crosshair;
-    width: 280;
-    height: 280;
 }
 
 button {

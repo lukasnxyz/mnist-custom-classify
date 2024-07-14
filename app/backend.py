@@ -39,4 +39,4 @@ def classify():
     return jsonify({'digit': predicted.item(), 'prob': prob})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
