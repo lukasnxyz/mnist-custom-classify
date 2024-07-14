@@ -33,7 +33,7 @@ async function classifyDigit() {
         body: JSON.stringify({ image: dataUrl })
     });
     const result = await response.json();
-    resultElement.textContent = `Prediction: ${result.digit}`;
+    resultElement.textContent = `Prediction: ${result.digit}, Probability: ${result.prob}`;
 }
 
 canvas.addEventListener('mousedown', (e) => {
